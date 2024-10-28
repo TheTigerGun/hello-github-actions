@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <button class="screenButton">录制</button>
+    <video class="video" width="30%" height="30%" controls>
+    
+    </video>
+     <!-- 
+    <a href="E:\External software\software and installation packages\installation package\Google Chrome Download\《c++》复习题集及答案.doc" target="downloadFile">ada</a>
+      -->
+   <script type="text/javascript">
+        const chunks = [];
+        document.querySelector(".screenButton").addEventListener('click', async function () {
+            //获取视频流对象 设置video=true 获取视频流信息 navigator导航器 mediaDevices媒体设备 getDisplayMedia获取显示媒体，audio声音
+            const mediaStream = await navigator.mediaDevices.getDisplayMedia({video: true,audio:true });
+            /* const audioStream = await navigator.mediaDevices.getUserMedia({audio:true});
+             audioStream.getAudioTracks().forEach(audioTrack=>{
+                mediaStream.addTrack(audioTrack)
+            })  */
+            //判断视频类型 指定视频类型
+            const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
+            //创建一个媒体记录器对象 MediaRecorder媒体记录器
+            const mediaRecorder = new MediaRecorder(mediaStream, { mimeType: mime })
+            //将录制视频放入chucks中 ondataavailable可用的数据
+            mediaRecorder.ondataavailable = (blobEvent) => {
+                chunks.push(blobEvent.data)
+            }
+            //当点击停止录制时将数据转为Bolb类型数据
+            mediaRecorder.addEventListener('stop', function () {
+                let blob = new Blob(chunks, {
+                    type: chunks[0].type
+                })
+                console.log(chunks[0].type)
+                //将录制的视频创建一个路径
+                let url = URL.createObjectURL(blob);
+                //创建source放入video中页面播放
+                let video = document.querySelector(".video")
+                var source = document.createElement("source");
+                source.src = url;
+                video.appendChild(source)
+                //创建a标签设置下载 点击a标签
+                let a = document.createElement('a')
+                a.href = url
+                a.download = 'video.webm'
+                a.click()
+
+            })
+            mediaRecorder.start()
+        })
+
+
+
+
+
+    </script>
+</body>
+
+</html>
